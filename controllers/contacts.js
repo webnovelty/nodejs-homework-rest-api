@@ -1,19 +1,20 @@
-const contacts = require('../models/contacts')
+
 const { HttpError, ctrlWrapper } = require('../helpers')
-const { Joi } = require('../schemas')
+const { Joi, Contact } = require('../schemas/')
 
 const getAll = async (req, res, next) => {
-	const result = await contacts.listContacts()
+	const result = await Contact.find()
 	res.json(result)
 }
 const getById = async (req, res, next) => {
 	const { contactId } = req.params;
-	const result = await contacts.getContactById(contactId)
+	const result = await Contact.findOne({ _id: contactId })
 	if (!result) {
 		throw HttpError(404, 'Not found')
 	}
 	res.json(result)
 }
+
 
 const add = async (req, res, next) => {
 
@@ -28,13 +29,13 @@ const add = async (req, res, next) => {
 		throw HttpError(400, "missing required name field")
 	}
 
-	const result = await contacts.addContact(name, email, phone)
+	const result = await Contact.create({name, email, phone})
 	res.status(201).json(result)
 }
 const del = async (req, res, next) => {
 
 	const { contactId } = req.params;
-	const result = await contacts.removeContact(contactId)
+	const result = await Contact.findByIdAndRemove({ _id: contactId });
 	if (!result) {
 		throw HttpError(404, 'Not found')
 	}
@@ -56,14 +57,29 @@ const put = async (req, res, next) => {
 	if (!name || !email || !phone) {
 		throw HttpError(400, 'missing fields')
 	}
-	const result = await contacts.updateContact(contactId, name, email, phone)
+	const result = await Contact.findByIdAndUpdate({ _id: contactId }, req.body);
 	res.json(result)
 
 }
+
+const favorite = async (req, res, next) => {
+
+	const { contactId } = req.params;
+	const { favorite } = req.body;
+
+	if (!favorite) {
+		throw HttpError(400, 'missing field favorite')
+	}
+	const result = await Contact.findByIdAndUpdate({ _id: contactId }, req.body, { new: true });
+	res.json(result)
+
+}
+
 module.exports = {
 	getAll: ctrlWrapper(getAll),
 	getById: ctrlWrapper(getById),
 	add: ctrlWrapper(add),
 	del: ctrlWrapper(del),
 	put: ctrlWrapper(put),
+	favorite: ctrlWrapper(favorite),
 }
