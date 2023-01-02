@@ -1,20 +1,21 @@
 const express = require('express')
 
-const ctrl = require('../../controllers/contacts')
+const ctrl = require('../../controllers/contacts/')
 
+const {authenticate} = require('../../middlewares/')
 
 const router = express.Router()
 
-router.get('/', ctrl.getAll)
+router.get('/', authenticate, ctrl.getAll)
 
-router.get('/:contactId', ctrl.getById)
+router.get('/:contactId', authenticate, ctrl.getById)
 
-router.post('/', ctrl.add)
+router.post('/', authenticate, ctrl.add)
 
-router.delete('/:contactId', ctrl.del)
+router.delete('/:contactId', authenticate, ctrl.del)
 
-router.put('/:contactId', ctrl.put)
+router.put('/:contactId', authenticate, ctrl.put)
 
-router.put('/:contactId/favorite', ctrl.favorite)
+router.put('/:contactId/favorite', authenticate, ctrl.favorite)
 
 module.exports = router
