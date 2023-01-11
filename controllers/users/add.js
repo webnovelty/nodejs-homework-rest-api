@@ -1,6 +1,7 @@
 const { HttpError, ctrlWrapper } = require('../../helpers')
 const { JoiUser, User } = require('../../schemas')
 const bcrypt = require('bcryptjs')
+const gravatar = require('gravatar')
 
 const add = async (req, res, next) => {
 
@@ -19,8 +20,11 @@ const add = async (req, res, next) => {
 	if (!email || !password) {
 		throw HttpError(400, "missing required name field")
 	}
-const hashPassword = await bcrypt.hash(password, 10)
-	const result = await User.create({...req.body, password: hashPassword})
+	const hashPassword = await bcrypt.hash(password, 10)
+	
+	const avatarURL = gravatar.url(email)
+
+	const result = await User.create({...req.body, password: hashPassword, avatarURL})
 	res.status(201).json(result)
 }
 
