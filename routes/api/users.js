@@ -12,5 +12,6 @@ router.post('/login', ctrl.login)
 router.get('/current', authenticate, ctrl.getCurrent)
 router.post('/logout', authenticate, ctrl.logout)
 router.post('/avatars', authenticate, upload.single("avatar"), ctrl.textFile)
+router.get('/verify/:verificationCode', ctrl.verify)
 
 module.exports = router

@@ -1,7 +1,10 @@
-const { HttpError, ctrlWrapper } = require('../../helpers')
-const { JoiUser, User } = require('../../schemas')
-const bcrypt = require('bcryptjs')
-const gravatar = require('gravatar')
+const { HttpError, ctrlWrapper, sendEmail } = require('../../helpers');
+const { JoiUser, User } = require('../../schemas');
+const bcrypt = require('bcryptjs');
+const gravatar = require('gravatar');
+const {nanoid} = require('nanoid');
+
+const { BASE_URL } = process.env;
 
 const add = async (req, res, next) => {
 
@@ -24,7 +27,18 @@ const add = async (req, res, next) => {
 	
 	const avatarURL = gravatar.url(email)
 
-	const result = await User.create({...req.body, password: hashPassword, avatarURL})
+	const verificationCode = nanoid()
+
+	const result = await User.create({ ...req.body, password: hashPassword, avatarURL, verificationCode })
+
+	const verifyEmail = {
+		to: email,
+		subject: "Verify Email",
+		html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationCode}">Click verify email</a>`
+	}
+
+	await sendEmail(verifyEmail)
+		
 	res.status(201).json(result)
 }
 

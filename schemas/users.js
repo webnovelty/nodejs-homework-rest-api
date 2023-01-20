@@ -24,6 +24,14 @@ const userSchema = new Schema(
 			type: String,
 			required: [true, 'Avatar is required'],
 		},
+		verify: {
+			type: Boolean,
+			default: false,
+		},
+		verificationCode: {
+			type: String,
+			required: [true, 'Verify token is required'],
+		},
 		
 	});
 
